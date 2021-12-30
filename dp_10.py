@@ -10,7 +10,8 @@ def print_latin_square():
     """
     # let users enter the order
     order = int(input("Enter the order of the Latin Square: "))
-    
+    # Edit file
+    print ("foo")
     # create the Latin Square
     for i in range(1, order+1):
         for j in range(i-1, order):
