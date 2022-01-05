@@ -47,6 +47,7 @@ starting_enviroment = pygame.sprite.Group(sky_surface, cloud_1 , cloud_2,cloud_3
 second_scene = pygame.sprite.Group(scrolls, Logo, scroll_close_blue, start, setting_text, scroll_close_gold, return_button)
 setting_screen = pygame.sprite.Group(scrolls, Logo, sound_status, sound_icon, return_button)
 scene1 = pygame.sprite.Group(return_button)
+map_1 = Library.map_layout("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\test.png","Game Asset\\test2.png" )
 
 
 
@@ -99,19 +100,19 @@ while True:
             second_scene.draw(screen)
             mouse = pygame.mouse.get_pos()
             if start.is_clicked(mouse):
-                image, rect = start.colors("Red", "Black")
+                image, rect = start.colors("Red")
             elif not start.is_clicked(mouse):
-                image, rect = start.colors("Black","Red")
+                image, rect = start.colors("Black")
             screen.blit(image, rect)
             if setting_text.is_clicked(mouse):
-                image, rect = setting_text.colors("Red", "Black")
+                image, rect = setting_text.colors("Red")
             elif not setting_text.is_clicked(mouse):
-                image, rect = setting_text.colors("Black","Red")
+                image, rect = setting_text.colors("Black")
             screen.blit(image, rect)
         elif starting_screen == "setting":
             setting_screen.draw(screen)
             mouse = pygame.mouse.get_pos()
-            
+    
     elif scene == "scene1":
         for event in pygame.event.get():
             Library.close_game(event.type)
@@ -121,8 +122,9 @@ while True:
                 if return_button.is_clicked(mouse):
                     scene = "starting"
                     continue
+        
         return_button.change_location((30, 550))
-        screen.blit(ingame_surface, (0,0))
+        map_1.draw(screen)
         screen.blit(function_surface, (800,0))
         screen.blit(activate_surface, (0,500))
         
