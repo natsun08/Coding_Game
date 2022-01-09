@@ -38,14 +38,54 @@ class ENVIROMENT(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = new_location)
         
         
-class VOID_TILE(pygame.sprite.Sprite):
+class PLAIN_TILE(pygame.sprite.Sprite):
     """This class is use for tile that can't be jump on"""
     def __init__(self, size, color, position):
         super().__init__()
         self.image = pygame.Surface(size)
         self.image.fill(color)
         self.rect = self.image.get_rect(topleft = position)
-        
+    
+class BUTTON(pygame.sprite.Sprite):
+    def __init__(self, size, color, position):
+        super().__init__()
+        self.image = pygame.Surface(size)
+        self.image.fill(color)
+        self.rect = self.image.get_rect(topleft = position)
+        self.pos = position
+        self.color = color
+    def run_button(self, direction):
+        self.command_dict = {"0": """player.go_up()\n""",
+                            "90": """player.go_left()\n""",
+            "180": """player.go_down()\n""",
+            "270": """player.go_left()\n"""}
+        return self.command_dict[direction]
+    def change_direction(self, old_direction, turn):
+        if turn == "left":
+            new_direction = int(old_direction) + 90
+        elif turn == "right":
+            new_direction = int(old_direction) - 90
+        if new_direction == 360:
+            new_direction = 0
+        return str(new_direction)
+    def change_location(self, newpos):
+        self.rect.center = newpos
+
+class PLAYER (pygame.sprite.Sprite):
+    def __init__(self, img_link, starting_position):
+        super().__init__()
+        self.image = pygame.image.load(img_link).convert_alpha()
+        self.image = pygame.transform.scale(self.image,(25, 25))
+        self.rect = self.image.get_rect(center = starting_position)
+    def go_up(self):
+        self.rect.top -=50
+    def go_down(self):
+        self.rect.top +=50
+    def go_left(self):
+        self.rect.left -=50
+    def go_right(self):
+        self.rect.left +=50
+
 class TEXT(pygame.sprite.Sprite):
     """This sprite class is use for text element"""
     def __init__(self, text, font, size, color, relative, pos_x, pos_y):
@@ -80,31 +120,48 @@ class TEXT(pygame.sprite.Sprite):
         self.image = self.font_type.render(new_text, False, new_color)
         self.rect = self.image.get_rect(center = self.rect.center)
 
+class MAP_LAYOUT(pygame.sprite.Group):
+    def __init__(self, mapfile, tile_size ,floor_im, gate_im):
+        super().__init__()
+        self.map = pygame.sprite.Group()
+        self.void_tiles = pygame.sprite.Group()
+        self.gate = pygame.sprite.Group()
+        map_layout = open(mapfile, "r")
+        map_layout = map_layout.read()
+        map_layout = map_layout.split("\n")
+        y = 0
+        for row in map_layout:
+            x = 0
+            for col in row:
+                
+                if col == "0":
+                    tile = PLAIN_TILE((25, 25), (225, 197, 190), (x*tile_size, y*tile_size))
+                    self.void_tiles.add(tile)
+                elif col == "2":
+                    tile = ENVIROMENT(gate_im, 1, "topleft", x*tile_size, y*tile_size)
+                    self.gate.add(tile)
+                elif col == "1":
+                    tile = ENVIROMENT(floor_im, 1, "topleft", x*tile_size, y*tile_size)
+                elif col == "3": 
+                    tile = ENVIROMENT(floor_im, 1, "topleft", x*tile_size, y*tile_size)
+                    self.player_start = (x*tile_size, y*tile_size)
+                self.map.add(tile)
+                x +=1
+            y +=1
+    def jump_to_the_void(self, sprite):
+        collide = pygame.sprite.spritecollide(sprite, self.void_tiles, False)
+        return (collide != [])
+    def reach_the_gate(self, sprite):
+        collide = pygame.sprite.spritecollide(sprite, self.gate, False)
+        return (collide != [])
+
 
 #Function
 def close_game(event):
     if event == pygame.QUIT:
         pygame.quit()
         exit()
-        
 
-def map_layout(mapfile, tile_size ,floor_im, gate_im):
-    map = pygame.sprite.Group()
-    map_layout = open(mapfile, "r")
-    map_layout = map_layout.read()
-    map_layout = map_layout.split("\n")
-    y = 0
-    for row in map_layout:
-        x = 0
-        for col in row:
-            
-            if col == "0":
-                tile = VOID_TILE((25, 25), "Black", (x*tile_size, y*tile_size))
-            elif col == "2":
-                tile = ENVIROMENT(gate_im, 1, "topleft", x*tile_size, y*tile_size)
-            elif col == "1":
-                tile = ENVIROMENT(floor_im, 1, "topleft", x*tile_size, y*tile_size)
-            map.add(tile)
-            x +=1
-        y +=1
-    return map
+def duplicate(old_sprite):
+    new_image = BUTTON(old_sprite.image.get_size(), old_sprite.color, old_sprite.pos)
+    return new_image
