@@ -56,7 +56,7 @@ class BUTTON(pygame.sprite.Sprite):
         self.color = color
     def run_button(self, direction):
         self.command_dict = {"0": """player.go_up()\n""",
-                            "90": """player.go_left()\n""",
+                            "90": """player.go_right()\n""",
             "180": """player.go_down()\n""",
             "270": """player.go_left()\n"""}
         return self.command_dict[direction]
@@ -67,6 +67,8 @@ class BUTTON(pygame.sprite.Sprite):
             new_direction = int(old_direction) - 90
         if new_direction == 360:
             new_direction = 0
+        elif new_direction == -90:
+            new_direction = 270
         return str(new_direction)
     def change_location(self, newpos):
         self.rect.center = newpos
