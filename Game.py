@@ -83,7 +83,7 @@ while True:
         pygame.event.pump()
         clock.tick(5)
         x+=1
-        if map_element_1.reach_the_gate(player) or len(code_active) > 0:
+        if map_element_1.reach_the_gate(player):
             is_sucess = True
         if map_element_1.jump_to_the_void(player):
             player.rect.center = map_element_1.player_start
