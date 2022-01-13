@@ -148,6 +148,9 @@ class MAP_LAYOUT(pygame.sprite.Group):
                 elif col == "3": 
                     tile = ENVIROMENT(floor_im, 1, "topleft", x*tile_size, y*tile_size)
                     self.player_start = (x*tile_size, y*tile_size)
+                elif col == "4":
+                    tile = ENVIROMENT(floor_im, 1, "topleft", x*tile_size, y*tile_size)
+                    self.key_pos  = (x*tile_size, y*tile_size)
                 self.map.add(tile)
                 x +=1
             y +=1

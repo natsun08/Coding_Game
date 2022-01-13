@@ -60,16 +60,19 @@ starting_enviroment = pygame.sprite.Group(sky_surface, cloud_1 , cloud_2,cloud_3
 second_scene = pygame.sprite.Group(scrolls, Logo, scroll_close_blue, start, setting_text, scroll_close_gold, return_button)
 setting_screen = pygame.sprite.Group(scrolls, Logo, sound_status, sound_icon, return_button)
 map_element_1 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
-map_element_2 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
+map_element_2 = Library.MAP_LAYOUT("Game Asset\Map\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
 #Thay tên file txt để đổi map 2
 map_element_3 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
 #Thay tên file txt để đổi map 3
 player = Library.PLAYER("Game Asset\\Art\\scroll_close_3.png", (0, 0))
+key = Library.PLAIN_TILE((25, 25), "black", (-100,-100))
+
 players = pygame.sprite.GroupSingle(player)
 buttons = pygame.sprite.Group()
 run_buttons = pygame.sprite.Group()
 turn_counter_clockwise_buttons = pygame.sprite.Group()
 turn_clockwise_buttons = pygame.sprite.Group()
+keys = pygame.sprite.Group(key)
 scroll_2 = pygame.sprite.Group(activate_surface, go_button, return_button, turn_right_button,turn_left_button )
 scroll_3 = pygame.sprite.Group(function_surface, compile_button)
 WIN_SCREEN = pygame.sprite.Group(victory_screen, sucess, redo_button, next_stage_button)
@@ -83,6 +86,7 @@ def map_draw(map_element):
     map_element.map.draw(screen)
     scroll_3.draw(screen)
     scroll_2.draw(screen)
+    keys.draw(screen)
     buttons.draw(screen)
     players.draw(screen)
 
@@ -97,7 +101,7 @@ while True:
         pygame.event.pump()
         clock.tick(5)
         x+=1
-        if map_element.reach_the_gate(player): #or code_active != []: #<- code này để test màn hình success
+        if map_element.reach_the_gate(player):#or code_active != []: #<- code này để test màn hình success
             is_sucess = True
         if map_element.jump_to_the_void(player):
             player.rect.center = map_element.player_start
@@ -116,7 +120,6 @@ while True:
             Library.close_game(event.type)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if redo_button.rect.collidepoint(mouse):
-                    scene = scenes[0]
                     is_sucess = False
                 if next_stage_button.rect.collidepoint(mouse):
                     scene_pos = scenes.index(scene)
@@ -191,6 +194,11 @@ while True:
         elif scene in scenes[1:-1]:
             map_element = map_element_dict[scene]
             player.rect.center = map_element.player_start
+            try:
+                key.rect.center = map_element.key_pos
+                have_key = True
+            except AttributeError:
+                have_key = False
             for event in pygame.event.get():
                 Library.close_game(event.type)
                 mouse = pygame.mouse.get_pos()
