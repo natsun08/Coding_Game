@@ -13,7 +13,9 @@ pygame.mixer.music.load("Game Asset\\Music\\Omoide Tsuzuri - Akatsuki.wav")
 pygame.mixer.music.play(-1)
 
 #VARIABLE
-scene = "starting"
+scenes = ["starting", "scene1", "scene2", "scene3", "ending/credit"]
+scene = scenes[0]
+#Vị trí cho scene
 starting_screen = "tittlescreen"
 volumn = 1.0
 is_sucess = False
@@ -21,9 +23,11 @@ get_drag = False
 code_active = []
 activate_code=False
 
+
 #Surface
 function_surface = Library.PLAIN_TILE((200, 600), "Gray",  (800,0))
 activate_surface = Library.PLAIN_TILE((800, 100), "White", (0, 500))
+
 #Sprite
 sky_surface = Library.ENVIROMENT("Game Asset\\Art\\Sky.png", 10, "topleft", 0, 0)
 cloud_1 = Library.ENVIROMENT("Game Asset\\Art\\Cloud1.png", 5, "topleft" , 80, 150)
@@ -40,22 +44,27 @@ setting_text = Library.TEXT("Setting","Game Asset\\font\\NinjaPenguin.ttf ", 70,
 sound_icon = Library.ENVIROMENT("Game Asset\\Art\\Sound_on.png", 1.5, "center", 400, 370)
 sound_status = Library.TEXT("On","Game Asset\\font\\ninja-naruto.regular.ttf", 50, "Red", "topleft", 450, 350)
 return_button = Library.ENVIROMENT("Game Asset\\Art\\Return.png", 1, "topleft", 200, 450)
-victory_screen = Library.PLAIN_TILE((500, 500), "pink", (300, 300))
+victory_screen = Library.PLAIN_TILE((800, 500), "pink", (100, 50))
+next_stage_button = Library.PLAIN_TILE((100, 50), "Blue", (650, 450))
+redo_button = Library.PLAIN_TILE((100, 50), "red", (300, 450))
 sucess = Library.TEXT("SUCCESED", "Game Asset\\font\\ninja-naruto.regular.ttf", 100, "Black", "center", 500, 300)
 go_button = Library.BUTTON((40, 40),"Blue", (100, 510))
 turn_right_button = Library.BUTTON((40, 40),"Red", (230, 510))
 turn_left_button = Library.BUTTON((40, 40),"Green", (180, 510))
 compile_button = Library.ENVIROMENT("Game Asset\\Art\\Sound_on.png", 1.5, "center", 810, 370)
-mouse_sprite = Library.PLAIN_TILE((20, 20), "White", (0, 0))
+mouse_sprite = Library.PLAIN_TILE((10, 10), "White", (0, 0))
 new_copy = Library.PLAIN_TILE((20, 20), "White", (0, 0))
 
 #GROUP
 starting_enviroment = pygame.sprite.Group(sky_surface, cloud_1 , cloud_2,cloud_3, cloud_4 , Logo, scroll_close_brown)
 second_scene = pygame.sprite.Group(scrolls, Logo, scroll_close_blue, start, setting_text, scroll_close_gold, return_button)
 setting_screen = pygame.sprite.Group(scrolls, Logo, sound_status, sound_icon, return_button)
-scene1 = pygame.sprite.Group(return_button)
 map_element_1 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
-player = Library.PLAYER("Game Asset\\Art\\scroll_close_3.png", map_element_1.player_start)
+map_element_2 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
+#Thay tên file txt để đổi map 2
+map_element_3 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
+#Thay tên file txt để đổi map 3
+player = Library.PLAYER("Game Asset\\Art\\scroll_close_3.png", (0, 0))
 players = pygame.sprite.GroupSingle(player)
 buttons = pygame.sprite.Group()
 run_buttons = pygame.sprite.Group()
@@ -63,30 +72,35 @@ turn_counter_clockwise_buttons = pygame.sprite.Group()
 turn_clockwise_buttons = pygame.sprite.Group()
 scroll_2 = pygame.sprite.Group(activate_surface, go_button, return_button, turn_right_button,turn_left_button )
 scroll_3 = pygame.sprite.Group(function_surface, compile_button)
-WIN_SCREEN = pygame.sprite.Group(victory_screen, sucess)
-def map_1():
+WIN_SCREEN = pygame.sprite.Group(victory_screen, sucess, redo_button, next_stage_button)
+map_element_dict = {"scene1" : map_element_1,
+                    "scene2" : map_element_2,
+                    "scene3" : map_element_3}
+
+#function
+def map_draw(map_element):
     return_button.change_location((30, 550))
-    map_element_1.map.draw(screen)
-    scene1.draw(screen)
+    map_element.map.draw(screen)
     scroll_3.draw(screen)
     scroll_2.draw(screen)
     buttons.draw(screen)
     players.draw(screen)
+
 #STARTING SCREEN
 while True:
     if activate_code and code_active != []:
         for event in pygame.event.get():
             Library.close_game(event.type)
         exec(code_active[x])
-        map_1()
+        map_draw(map_element_dict[scene])
         pygame.display.update()
         pygame.event.pump()
         clock.tick(5)
         x+=1
-        if map_element_1.reach_the_gate(player):
+        if map_element.reach_the_gate(player): #or code_active != []: #<- code này để test màn hình success
             is_sucess = True
-        if map_element_1.jump_to_the_void(player):
-            player.rect.center = map_element_1.player_start
+        if map_element.jump_to_the_void(player):
+            player.rect.center = map_element.player_start
             x = 0
             run = "done"
         if x == len(code_active) or is_sucess:
@@ -94,11 +108,21 @@ while True:
         if run == "done":
             activate_code = False
             code_active = []
-            player.rect.center = map_element_1.player_start
+            player.rect.center = map_element.player_start
         continue
     if is_sucess:
+        mouse = pygame.mouse.get_pos()
         for event in pygame.event.get():
             Library.close_game(event.type)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if redo_button.rect.collidepoint(mouse):
+                    scene = scenes[0]
+                    is_sucess = False
+                if next_stage_button.rect.collidepoint(mouse):
+                    scene_pos = scenes.index(scene)
+                    scene = scenes[scene_pos + 1]
+                    buttons.empty()
+                    is_sucess = False
         WIN_SCREEN.draw(screen)
         pygame.display.update()
         clock.tick(5)
@@ -164,7 +188,9 @@ while True:
                 setting_screen.draw(screen)
                 mouse = pygame.mouse.get_pos()
                 
-        elif scene == "scene1":
+        elif scene in scenes[1:-1]:
+            map_element = map_element_dict[scene]
+            player.rect.center = map_element.player_start
             for event in pygame.event.get():
                 Library.close_game(event.type)
                 mouse = pygame.mouse.get_pos()
@@ -191,7 +217,7 @@ while True:
                         new_copy = Library.duplicate(turn_left_button)
                         turn_clockwise_buttons.add(new_copy)
                         buttons.add(new_copy)
-
+                    
                     if buttons.sprites() != [] and compile_button.rect.collidepoint(mouse):
                         all_buttons = buttons.sprites()
                         direction = "0"
@@ -209,15 +235,16 @@ while True:
                     new_copy.change_location(mouse)
                     buttons.update()
                 if event.type == pygame.MOUSEBUTTONUP:
-                    if scene == "scene1":
-                        if not new_copy.rect.colliderect(function_surface.rect):
-                            new_copy.kill()
-                            buttons.update()
-                        get_drag = False
+                    if not new_copy.rect.colliderect(function_surface.rect):
+                        new_copy.kill()
+                        buttons.update()
+                    get_drag = False
+            map_draw(map_element)
             
-            map_1()
-            
-                
+        elif scene == "ending/credit":
+            for event in pygame.event.get():
+                Library.close_game(event.type)
+            starting_enviroment.draw(screen)
         pygame.display.update()
         clock.tick(60)
 

@@ -39,7 +39,7 @@ class ENVIROMENT(pygame.sprite.Sprite):
         
         
 class PLAIN_TILE(pygame.sprite.Sprite):
-    """This class is use for tile that can't be jump on"""
+    """This class is use for tile with 1 color"""
     def __init__(self, size, color, position):
         super().__init__()
         self.image = pygame.Surface(size)
@@ -123,6 +123,7 @@ class TEXT(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = self.rect.center)
 
 class MAP_LAYOUT(pygame.sprite.Group):
+    
     def __init__(self, mapfile, tile_size ,floor_im, gate_im):
         super().__init__()
         self.map = pygame.sprite.Group()
