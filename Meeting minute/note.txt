@@ -1,0 +1,6 @@
+red - clockwise 
+green - anti-clockwise
+blue - đi 50 bước
+
+round 2: lấy key
+round 3: đi vòng để lấy key
