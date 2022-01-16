@@ -60,10 +60,8 @@ starting_enviroment = pygame.sprite.Group(sky_surface, cloud_1 , cloud_2,cloud_3
 second_scene = pygame.sprite.Group(scrolls, Logo, scroll_close_blue, start, setting_text, scroll_close_gold, return_button)
 setting_screen = pygame.sprite.Group(scrolls, Logo, sound_status, sound_icon, return_button)
 map_element_1 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
-map_element_2 = Library.MAP_LAYOUT("Game Asset\Map\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
-#Thay tên file txt để đổi map 2
-map_element_3 = Library.MAP_LAYOUT("Game Asset\\Map\\First_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
-#Thay tên file txt để đổi map 3
+map_element_2 = Library.MAP_LAYOUT("Game Asset\Map\Second_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
+map_element_3 = Library.MAP_LAYOUT("Game Asset\Map\Third_map_layout.txt", 25, "Game Asset\\Art\\test.png","Game Asset\\Art\\test.png" )
 player = Library.PLAYER("Game Asset\\Art\\scroll_close_3.png", (0, 0))
 key = Library.PLAIN_TILE((25, 25), "black", (-100,-100))
 
@@ -101,7 +99,12 @@ while True:
         pygame.event.pump()
         clock.tick(5)
         x+=1
-        if map_element.reach_the_gate(player):#or code_active != []: #<- code này để test màn hình success
+        if have_key:
+            if player.rect.collidepoint(map_element.key_pos):
+                print(1)
+                key_to_gate = True
+                key.rect.center = (-100, -100)
+        if (map_element.reach_the_gate(player))  and (key_to_gate or not have_key): ##or code_active != []) <- code này để test màn hình success
             is_sucess = True
         if map_element.jump_to_the_void(player):
             player.rect.center = map_element.player_start
@@ -111,6 +114,7 @@ while True:
             run = "done"
         if run == "done":
             activate_code = False
+            key_to_gate = False
             code_active = []
             player.rect.center = map_element.player_start
         continue
@@ -239,6 +243,7 @@ while True:
                         x = 0
                         run = "start"
                         activate_code = True
+                        key_to_gate = False
                 if get_drag:
                     new_copy.change_location(mouse)
                     buttons.update()

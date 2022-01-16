@@ -73,6 +73,8 @@ class BUTTON(pygame.sprite.Sprite):
     def change_location(self, newpos):
         self.rect.center = newpos
 
+
+
 class PLAYER (pygame.sprite.Sprite):
     def __init__(self, img_link, starting_position):
         super().__init__()
@@ -160,6 +162,7 @@ class MAP_LAYOUT(pygame.sprite.Group):
     def reach_the_gate(self, sprite):
         collide = pygame.sprite.spritecollide(sprite, self.gate, False)
         return (collide != [])
+    
 
 
 #Function
