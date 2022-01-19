@@ -48,14 +48,14 @@ class PLAIN_TILE(pygame.sprite.Sprite):
     
 class BUTTON(pygame.sprite.Sprite):
     """This class creates buttons. """
-    def __init__(self, size, color, position):
+    def __init__(self, img_link, position):
         """ This function creates buttons with provided size, colors, and position. """
         super().__init__()
-        self.image = pygame.Surface(size)
-        self.image.fill(color)
+        self.image = pygame.image.load(img_link)
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() * 2, self.image.get_height() *2))
         self.rect = self.image.get_rect(topleft = position)
         self.pos = position
-        self.color = color
+        self.img = img_link
     def run_button(self, direction):
         """ This function contains directions that buttons make players move in. """
         self.command_dict = {"0": """player.go_up()\n""",
@@ -87,7 +87,6 @@ class PLAYER (pygame.sprite.Sprite):
             starting_position: player's position at the start of the round """
         super().__init__()
         self.image = pygame.image.load(img_link).convert_alpha()
-        self.image = pygame.transform.scale(self.image,(25, 25))
         self.rect = self.image.get_rect(center = starting_position)
     def go_up(self):
         """ Function that lets player go straight ahead 50 steps. """
@@ -141,13 +140,14 @@ class TEXT(pygame.sprite.Sprite):
 
 class MAP_LAYOUT(pygame.sprite.Group):
     """ This sprite class decides the map layout of the game. """
-    def __init__(self, mapfile, tile_size, floor_im, gate_im):
+    def __init__(self, mapfile, tile_size, floor_im, gate_im_up, gate_im_bot):
         """ This function defines the MAP_LAYOUT class
         Parameters:
             mapfile: image file that contains map layout.
             tile_size: the size of tile
             floor_im: image file that makes the floor
-            gate_im: image file that makes the gate
+            gate_im_up: image file that makes the upper part of gate
+            gate_im_bot: image file that makes the bottom part of gate
         """
         super().__init__()
         self.map = pygame.sprite.Group()
@@ -157,6 +157,7 @@ class MAP_LAYOUT(pygame.sprite.Group):
         map_layout = map_layout.read()
         map_layout = map_layout.split("\n")
         y = 0
+        is_flip = False
         for row in map_layout:
             x = 0
             for col in row:
@@ -164,7 +165,16 @@ class MAP_LAYOUT(pygame.sprite.Group):
                     tile = PLAIN_TILE((25, 25), (225, 197, 190), (x*tile_size, y*tile_size))
                     self.void_tiles.add(tile)
                 elif col == "2":
-                    tile = ENVIRONMENT(gate_im, 1, "topleft", x*tile_size, y*tile_size)
+                    tile = ENVIRONMENT(gate_im_up, 1, "topleft", x*tile_size, y*tile_size)
+                    if is_flip:
+                        tile.image = pygame.transform.flip(tile.image, True, False)
+                    is_flip = not is_flip
+                    self.gate.add(tile)
+                elif col == "5":
+                    tile = ENVIRONMENT(gate_im_bot, 1, "topleft", x*tile_size, y*tile_size)
+                    if is_flip:
+                        tile.image = pygame.transform.flip(tile.image, True, False)
+                    is_flip = not is_flip
                     self.gate.add(tile)
                 elif col == "1":
                     tile = ENVIRONMENT(floor_im, 1, "topleft", x*tile_size, y*tile_size)
@@ -195,5 +205,5 @@ def close_game(event):
 
 def duplicate(old_sprite):
     """ This function duplicates existing buttons. """
-    new_image = BUTTON(old_sprite.image.get_size(), old_sprite.color, old_sprite.pos)
+    new_image = BUTTON(old_sprite.img,old_sprite.pos)
     return new_image
