@@ -1,0 +1,18 @@
+How to play:
+
+Drag the buttons to the right panel in the correct order to get out of the maze.
+Pick up objects on the way if requested.
+
+ - Blue: Go straight ahead (50 steps)
+ - Red: Turn right
+ - Green: Turn left
+
+Click on "Play" to run. 
+If players fail, go back to the start.
+
+
+
+ 
+
+
+

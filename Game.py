@@ -108,6 +108,7 @@ def map_draw(map_element):
 #STARTING SCREEN
 while True:
     if activate_code and code_active != []:
+        #Run the script
         for event in pygame.event.get():
             Library.close_game(event.type)
         exec(code_active[x])
@@ -117,32 +118,39 @@ while True:
         clock.tick(5)
         x+=1
         if have_key:
+            #If the game have key then player must reach the key in order to finish the game
             if player.rect.collidepoint(map_element.key_pos):
                 print(1)
                 key_to_gate = True
                 key.rect.center = (-100, -100)
-        if (map_element.reach_the_gate(player))  and (key_to_gate or not have_key): ##code_active != []) <- code này để test màn hình success
+        if (map_element.reach_the_gate(player))  and (key_to_gate or not have_key):
             is_sucess = True
         if map_element.jump_to_the_void(player):
+            #If the player touch the non floor tile they will be teleport to the start and end the run
             player.rect.center = map_element.player_start
             x = 0
             run = "done"
         if x == len(code_active) or is_sucess:
+            #When the run through all the code or reach the gate
             run = "done"
         if run == "done":
+            #Reset the player to the start and clear the script when the run is done
             activate_code = False
             key_to_gate = False
             code_active = []
             player.rect.center = map_element.player_start
         continue
     if is_sucess:
+        #Success screen
         mouse = pygame.mouse.get_pos()
         for event in pygame.event.get():
             Library.close_game(event.type)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if redo_button.rect.collidepoint(mouse):
+                    #Go back to the stage if pressed redo
                     is_sucess = False
                 if next_stage_button.rect.collidepoint(mouse):
+                    #Go to the next stage
                     scene_pos = scenes.index(scene)
                     scene = scenes[scene_pos + 1]
                     buttons.empty()
@@ -197,9 +205,9 @@ while True:
             cloud_3.animate(4)
             cloud_4.animate(-2)
             if starting_screen == "started or setting":
-                #Change the color of the text based on if the mouse is hovering on the text. 
                 second_scene.draw(screen)
                 mouse = pygame.mouse.get_pos()
+                #Change the color of the text based on if the mouse is hovering on the text. 
                 if start.is_clicked(mouse):
                     image, rect = start.colors("Red")
                 elif not start.is_clicked(mouse):
@@ -215,9 +223,11 @@ while True:
                 mouse = pygame.mouse.get_pos()
                 
         elif scene in scenes[1:-1]:
+            #For general game map
             map_element = map_element_dict[scene]
             player.rect.center = map_element.player_start
             try:
+                #See if the map require a key or not
                 key.rect.center = map_element.key_pos
                 have_key = True
             except AttributeError:
@@ -227,15 +237,18 @@ while True:
                 mouse = pygame.mouse.get_pos()
                 mouse_sprite.rect.center = mouse
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    #Left click 
+                    #when Left click 
                     if is_tutorial:
+                        #Turn off the tutorial in the first round
                         is_tutorial = False
                     if return_button.is_clicked(mouse):
                         scene = "starting"
                         continue
                     if not get_drag and pygame.sprite.spritecollide(mouse_sprite, buttons, False) != []:
+                        #Delete a button when clicked
                         pygame.sprite.spritecollide(mouse_sprite, buttons, True)
                     if go_button.rect.collidepoint(mouse):
+                        #start draging a button
                         get_drag = True
                         new_copy = Library.duplicate(go_button)
                         run_buttons.add(new_copy)
@@ -252,6 +265,7 @@ while True:
                         buttons.add(new_copy)
                     
                     if buttons.sprites() != [] and compile_button.rect.collidepoint(mouse):
+                        #Put all the code into code_active 
                         all_buttons = buttons.sprites()
                         direction = "0"
                         for sprite in all_buttons:
@@ -266,15 +280,19 @@ while True:
                         activate_code = True
                         key_to_gate = False
                 if get_drag:
+                    #Drag the buttons
                     new_copy.change_location(mouse)
                     buttons.update()
                 if event.type == pygame.MOUSEBUTTONUP:
+                    #Drop off the buttons
                     if not new_copy.rect.colliderect(function_surface.rect):
+                        #Remove the buttons if the drop off spot isn't the function surface
                         new_copy.kill()
                         buttons.update()
                     get_drag = False
             map_draw(map_element)
             if is_tutorial:
+                #Draw the tutorial if this is the first time the game open
                 tutorial_screen.draw(screen)
             
         elif scene == "ending/credit":
