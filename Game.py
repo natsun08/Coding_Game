@@ -120,7 +120,6 @@ while True:
         if have_key:
             #If the game have key then player must reach the key in order to finish the game
             if player.rect.collidepoint(map_element.key_pos):
-                print(1)
                 key_to_gate = True
                 key.rect.center = (-100, -100)
         if (map_element.reach_the_gate(player))  and (key_to_gate or not have_key):
